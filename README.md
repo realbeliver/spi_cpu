@@ -1,33 +1,42 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# Super-Simple-SPI CPU
+# Tiny Tapeout Verilog Project Template
 
-This repository contains a tiny **4‑bit microcoded CPU** designed for **TinyTapeout (GF180MCU)** that fetches its program over **SPI** from external memory (e.g., an RP2040 emulating 23LC512‑style RAM). The demo configuration runs a microcoded **4×4‑bit → 8‑bit multiplier**.
+- [Read the documentation for project](docs/info.md)
 
-At a glance, this project showcases:
-* A compact **single-cycle datapath** (register file, ALU, shift register, accumulator)
-* An instruction stream fetched from **external SPI memory**
-* A complete **TinyTapeout‑ready top level** with tests and simulation setup
+## What is Tiny Tapeout?
 
----
+Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
 
-## Hardware Pin Mapping
+To learn more and get started, visit https://tinytapeout.com.
 
-| TinyTapeout Pins | Signal Name | Type | Description |
-| :--- | :--- | :--- | :--- |
-| `ui_in[7:4]` | Operand **A** | Input | 4‑bit input multiplicand |
-| `ui_in[3:0]` | Operand **B** | Input | 4‑bit input multiplier |
-| `uo_out[7:0]` | Register **O** | Output | 8-bit output product |
+## Set up your Verilog project
 
-*(Note: For explicit SPI pin assignments including SCLK, CS, MOSI, and MISO, please refer to the complete pinout in `docs/info.md`.)*
+1. Add your Verilog files to the `src` folder.
+2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
+3. Edit [docs/info.md](docs/info.md) and add a description of your project.
+4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
 
----
+The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
 
-## Quick Start - Running the Tests
+## Enable GitHub actions to build the results page
 
-1. Clone the repository and ensure your simulation dependencies (`Python`, `cocotb`, `Icarus Verilog`) are installed.
-2. Navigate to the test directory and execute the testbench sweep:
+- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
 
-```sh
-cd test
-make -B results.xml
+## Resources
+
+- [FAQ](https://tinytapeout.com/faq/)
+- [Digital design lessons](https://tinytapeout.com/digital_design/)
+- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
+- [Join the community](https://tinytapeout.com/discord)
+- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
+
+## What next?
+
+- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
+- Edit [this README](README.md) and explain your design, how it works, and how to test it.
+- Share your project on your social network of choice:
+  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
+  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
+  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
+  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
