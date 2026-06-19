@@ -54,31 +54,27 @@
 
 module tb ();
 
-  // Dump the signals to an FST file (CI expects tb.fst)
   initial begin
     $dumpfile("tb.fst");
     $dumpvars(0, tb);
     #1;
   end
 
-  // Wire up the inputs and outputs:
-  reg clk;
-  reg rst_n;
-  reg ena;
-  reg [7:0] ui_in;
-  reg [7:0] uio_in;
+  reg        clk;
+  reg        rst_n;
+  reg        ena;
+  reg  [7:0] ui_in;
+  reg  [7:0] uio_in;
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
 `ifdef GL_TEST
-  // Power pins for gate-level sim
   wire VPWR = 1'b1;
   wire VGND = 1'b0;
 `endif
 
-// DUT: your TinyTapeout top
-  tt_um_spi_cpu_top user_project (
+  tt_um_sem15_mul user_project (
 `ifdef GL_TEST
       .VPWR(VPWR),
       .VGND(VGND),
@@ -92,79 +88,5 @@ module tb ();
       .clk    (clk),
       .rst_n  (rst_n)
   );
-
-  // --- Hook up SPI RAM model to uio pins ---
-
-  wire cs_n = uio_out[0];
-  wire mosi = uio_out[1];
-  wire sck  = uio_out[3];
-  wire miso;
-  wire valid = uo_out[7];
-
-  
-  // Behavioural SPI RAM model (READ 0x03 only)
-  spi_ram_model #(.MEM_BYTES(256)) ram (
-      .cs_n (cs_n),
-      .sck  (sck),
-      .mosi (mosi),
-      .miso (miso)
-  );
-
-  // Feed MISO back into DUT on uio_in[2]
-  always @* begin
-      uio_in      = 8'h00;
-      uio_in[2]   = miso;
-  end
-
-  // Program external SPI RAM with the tiny CPU program
- // Program external SPI RAM with a simple CPU program
-  initial begin
-
-     // Reset / initial state
-      clk   = 1'b0;
-      rst_n = 1'b0;
-      ena   = 1'b0;
-      ui_in = 8'h00;
-      
-      #50;
-      rst_n = 1'b1;
-      ena   = 1'b1;
-  end
-  
-  always #10 clk = ~clk;
-  
-  initial begin
-      // ram.mem[8'h00] = 8'b0001_0000; // LDB, LDA
-      // ram.mem[8'h01] = 8'b0010_1010; // LDO, ADD
-      // ram.mem[8'h02] = 8'b0010_1011; // LDO, SUB
-      // ram.mem[8'h03] = 8'b0010_1110; // LDO, XOR
-      // ram.mem[8'h04] = 8'b0110_0011; // RSH, LDSA
-      // ram.mem[8'h05] = 8'b0010_1000; // LDSB, SNZ A
-      // ram.mem[8'h06] = 8'b0100_0010; // SNZ S, LSH
-      // ram.mem[8'h07] = 8'b0111_0010; // CLR, LDO
-
-      // // load a multiplicartion program into ram
-      ram.mem[8'h00] = 8'b0001_0000; // LDB, LDA
-      ram.mem[8'h01] = 8'b0110_0100; // RSH, LDSB
-      ram.mem[8'h02] = 8'b0110_1000; // RSH, SNZ A
-      ram.mem[8'h03] = 8'b0101_0011; // LSH, LDSA
-      ram.mem[8'h04] = 8'b0100_1001; // LDSB, SNZ S
-      ram.mem[8'h05] = 8'b0110_0110; // RSH, RSH
-      ram.mem[8'h06] = 8'b0011_0110; // LDSA, RSH
-      ram.mem[8'h07] = 8'b0101_0101; // LSH, LSH
-      ram.mem[8'h08] = 8'b0100_1001; // LDSB, SNZ S
-      ram.mem[8'h09] = 8'b0110_0110; // RSH, RSH
-      ram.mem[8'h0A] = 8'b0110_0110; // RSH, RSH
-      ram.mem[8'h0B] = 8'b0101_0011; // LSH, LDSA
-      ram.mem[8'h0C] = 8'b0101_0101; // LSH, LSH
-      ram.mem[8'h0D] = 8'b0010_1001; // LDO, SNZ S
-      ram.mem[8'h0E] = 8'b0111_0111; // CLR, CLR
-      ram.mem[8'h0F] = 8'b0111_0111; // CLR, CLR
-
-      for (int i = 16; i < 256; i=i+1) begin
-          ram.mem[i] = 8'b0111_0111; // CLR, CLR
-      end
-      
-  end
 
 endmodule
